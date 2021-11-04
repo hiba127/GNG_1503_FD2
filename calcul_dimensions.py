@@ -7,7 +7,7 @@ import numpy as np
 import imutils
 from google.colab.patches import cv2_imshow
 
-image_raw = cv2.imread("/content/drive/MyDrive/Colab Notebooks/Wicked-SKF-bearing.jpg")
+image_raw = cv2.imread("/content/drive/MyDrive/Colab Notebooks/hoop1.jpg")
 
 def midpoint(x, y):
 	return ((x[0] + y[0]) * 0.5, (x[1] + y[1]) * 0.5)
@@ -37,26 +37,28 @@ def reconnaissance(image):
     if (n>9) & (cv2.contourArea(cnt)>3000):
       cv2.drawContours(image,[cnt],0,(255,0,0),5)
       countour_liste.append(cnt)
-
-      box = cv2.minAreaRect(cnt)
-      box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
-      box = np.array(box, dtype="int")
-      box = perspective.order_points(box)
-
-      (tl, tr, br, bl) = box
-      (tltrX, tltrY) = midpoint(tl, tr)
-      (blbrX, blbrY) = midpoint(bl, br)
-
-      (tlblX, tlblY) = midpoint(tl, bl)
-      (trbrX, trbrY) = midpoint(tr, br)
-
-      dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
-      dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
-      # if the pixels per metric has not been initialized, then
-      # compute it as the ratio of pixels to supplied metric
               
       if pixelsPerMetric is None:
-        pixelsPerMetric = dB / 0.955 #width of the reference circle, change if needed
+
+        box = cv2.minAreaRect(cnt)
+        box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+        box = np.array(box, dtype="int")
+        box = perspective.order_points(box)
+
+        (tl, tr, br, bl) = box
+        (tltrX, tltrY) = midpoint(tl, tr)
+        (blbrX, blbrY) = midpoint(bl, br)
+
+        (tlblX, tlblY) = midpoint(tl, bl)
+        (trbrX, trbrY) = midpoint(tr, br)
+
+        dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
+        dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
+        # if the pixels per metric has not been initialized, then
+        # compute it as the ratio of pixels to supplied metric
+
+        print(dB)
+        pixelsPerMetric = dB / 2.4 #width of the reference circle, change if needed
 
 
   cnt_trier = sorted(countour_liste, key=cv2.contourArea)
@@ -81,6 +83,8 @@ def reconnaissance(image):
   epaisseur = 3
   image = cv2.circle(image, coordinées_centre, rayonDE, vert, epaisseur)
   image = cv2.circle(image, coordinées_centre, rayonDI, rouge, epaisseur)
+
+
 
   cv2_imshow(image)
 
